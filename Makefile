@@ -1,35 +1,32 @@
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := lint
 
-APP_NAME="ansible-role-sysinfo"
+molecule_distros := centos\:7 \
+	ubuntu\:18.04 \
+	ubuntu\:19.04
 
-.PHONY: help
-help:
-	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile \
-		| awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' \
-		| sed -e 's/\[32m##/[33m/'
-
-## Ansible targets
+test-targets = $(addprefix test-,$(molecule_distros))
+run-targets = $(addprefix run-,$(molecule_distros))
 
 .PHONY: lint
-lint: ## Run project linter
-	@ansible-lint .
+lint:
+	yamllint .
+	ansible-lint .
 
-## Vagrant targets
+.PHONY: test-all
+test-all: $(test-targets)
 
-.PHONY: provision
-provision: ## Re-run Vagrant ansible provisioners
-	@vagrant provision --provision-with ansible
+$(test-targets): export MOLECULE_DISTRO = $(subst test-,,$@)
+$(test-targets) test: 
+	molecule test
 
-## Project targets
+.PHONY: run-all
+run-all: $(run-targets)
+
+$(run-targets): export MOLECULE_DISTRO = $(subst run-,,$@)
+$(run-targets) run:
+	molecule create; \
+	molecule destroy
 
 .PHONY: clean
-clean: ## Teardown working environment
-	@vagrant destroy --force
-	@vboxmanage list runningvms \
-	| grep ${APP_NAME} \
-	| awk '{ print $$2 }' \
-	| xargs -I vmid vboxmanage controlvm vmid poweroff
-	@vboxmanage list vms \
-	| grep ${APP_NAME} \
-	| awk '{ print $$2 }' \
-	| xargs -I vmid vboxmanage unregistervm vmid
+clean:
+	@molecule destroy

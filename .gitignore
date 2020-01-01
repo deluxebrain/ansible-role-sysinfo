@@ -9,3 +9,9 @@ boxes/*
 
 # Ansible
 *.retry
+
+# Molecule
+*/__pycache__
+
+# Python
+*.pyc

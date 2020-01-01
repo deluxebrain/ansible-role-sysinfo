@@ -1,5 +1,7 @@
 # Role Name: SYSINFO
 
+[![Build Status](https://travis-ci.org/deluxebrain/ansible-role-sysinfo.svg?branch=master)](https://travis-ci.org/deluxebrain/ansible-role-sysinfo)
+
 Prints system information related Ansible facts.
 
 ## Requirements

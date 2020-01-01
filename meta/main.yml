@@ -6,8 +6,8 @@ galaxy_info:
   description: System information printout for Linux
   license: license (BSD, MIT)
   min_ansible_version: 2.9
-  platforms:
-    - name: Debian
+  platforms:   
+    - name: EL
       versions:
         - all
     - name: Ubuntu
