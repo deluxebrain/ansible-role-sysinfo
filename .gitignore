@@ -1,12 +1,6 @@
 # IDE's
 .vscode
 
-# Vagrant
-boxes/*
-/.vagrant
-*.log
-.vagrantuser
-
 # Ansible
 *.retry
 
@@ -15,3 +9,6 @@ boxes/*
 
 # Python
 *.pyc
+
+# Makefile related
+.*_timestamp
