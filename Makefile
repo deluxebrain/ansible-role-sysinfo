@@ -24,7 +24,7 @@ run-all: $(run-targets)
 
 $(run-targets): export MOLECULE_DISTRO = $(subst run-,,$@)
 $(run-targets) run:
-	molecule create; \
+	molecule converge; \
 	molecule destroy
 
 .PHONY: clean
