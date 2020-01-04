@@ -1,50 +1,59 @@
 .DEFAULT_GOAL := lint
+.PHONY: venv install lint test-all run-all run connect clean
+VENV_NAME := .venv
+VENV := $(VENV_NAME)/.timestamp
+VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
+SITE_PACKAGES := $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
+	pip3 show pip | grep ^Location | cut -d':' -f2)
 RUN := .run_timestamp
+DISTROS := centos_7 \
+	ubuntu_18.04 \
+	ubuntu_19.04
+TEST_TARGETS := $(addprefix test-,$(DISTROS))
+RUN_TARGETS := $(addprefix run-,$(DISTROS))
 
-molecule_distros := ubuntu\:18.04 \
-	ubuntu\:19.04
+venv: $(VENV)
+$(VENV):
+	python3 -m venv $(VENV_NAME)/	
+	touch $@
 
-test-targets = $(addprefix test-,$(molecule_distros))
-run-targets = $(addprefix run-,$(molecule_distros))
+install: venv $(SITE_PACKAGES) 
+$(SITE_PACKAGES): requirements.txt
+	$(VENV_ACTIVATE); \
+	pip3 install -r requirements.txt		
 
-.PHONY: init
-init:
-	pip3 install --user molecule
-	pip3 install --user molecule[docker]
-	molecule init scenario -r ansible-role-sysinfo 
-
-.PHONY: lint
 lint:
 	yamllint .
 	ansible-lint .
 
-.PHONY: test-all
-test-all: $(test-targets)
-
-$(test-targets): export MOLECULE_DISTRO = $(subst test-,,$@)
-test $(test-targets):
+test: install
+	$(VENV_ACTIVATE); \
 	molecule test
 
-.PHONY: run-all
-run-all: $(run-targets)
+test-all: install clean $(TEST_TARGETS)
+$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst test-,,$@))
+$(TEST_TARGETS):
+	$(VENV_ACTIVATE); \
+	molecule test
 
-$(run-targets): export MOLECULE_DISTRO = $(subst run-,,$@)
-$(run-targets):
-	molecule converge
+run: install $(RUN)
+$(RUN):
+	$(VENV_ACTIVATE); \
+	molecule converge; \
+	touch $@	
+
+run-all: install clean $(RUN_TARGETS)
+$(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
+$(RUN_TARGETS):
+	$(VENV_ACTIVATE); \
+	molecule converge; \
 	molecule destroy
 
-.PHONY: run
-run: $(RUN)
-
-$(RUN):
-	molecule converge
-	@touch $@
-
-.PHONY: login
-login: run
+connect: run
+	$(VENV_ACTIVATE); \
 	molecule login
 
-.PHONY: clean
-clean:
-	@molecule destroy
-	@rm -f $(RUN)
+clean: install
+	$(VENV_ACTIVATE); \
+	molecule destroy; \
+	rm -f $(RUN)

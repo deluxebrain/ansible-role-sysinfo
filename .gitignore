@@ -1,5 +1,6 @@
-# IDE's
-.vscode
+# Python
+*.pyc
+.venv
 
 # Ansible
 *.retry
@@ -7,8 +8,8 @@
 # Molecule
 */__pycache__
 
-# Python
-*.pyc
+# IDE's
+.vscode
 
 # Makefile related
 .*_timestamp
