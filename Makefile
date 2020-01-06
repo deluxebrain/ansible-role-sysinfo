@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := lint
-.PHONY: venv install lint test-all run-all run connect clean
+.PHONY: venv install lint converge run connect run-all test test-all clean
 VENV_NAME := .venv
 VENV := $(VENV_NAME)/.timestamp
 VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
@@ -10,6 +10,7 @@ DISTROS := centos_7 \
 	ubuntu_19.04
 TEST_TARGETS := $(addprefix test-,$(DISTROS))
 RUN_TARGETS := $(addprefix run-,$(DISTROS))
+RUN := .run_timestamp
 
 venv: $(VENV)
 $(VENV):
@@ -25,6 +26,27 @@ lint:
 	yamllint .
 	ansible-lint .
 
+converge: install
+	$(VENV_ACTIVATE); \
+	molecule converge
+
+run: $(RUN)
+$(RUN):
+	$(VENV_ACTIVATE); \
+	molecule converge
+	touch $@
+
+connect: run
+	$(VENV_ACTIVATE); \
+	molecule login
+
+run-all: install clean $(RUN_TARGETS)
+$(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
+$(RUN_TARGETS):
+	$(VENV_ACTIVATE); \
+	molecule converge; \
+	molecule destroy	
+
 test: install
 	$(VENV_ACTIVATE); \
 	molecule test
@@ -34,21 +56,6 @@ $(TEST_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst test-,,$@))
 $(TEST_TARGETS):
 	$(VENV_ACTIVATE); \
 	molecule test
-
-run: install
-	$(VENV_ACTIVATE); \
-	molecule converge	
-
-run-all: install clean $(RUN_TARGETS)
-$(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
-$(RUN_TARGETS):
-	$(VENV_ACTIVATE); \
-	molecule converge; \
-	molecule destroy
-
-connect: run
-	$(VENV_ACTIVATE); \
-	molecule login
 
 clean: install
 	$(VENV_ACTIVATE); \
