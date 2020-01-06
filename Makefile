@@ -5,7 +5,6 @@ VENV := $(VENV_NAME)/.timestamp
 VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
 SITE_PACKAGES := $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
 	pip3 show pip | grep ^Location | cut -d':' -f2)
-RUN := .run_timestamp
 DISTROS := centos_7 \
 	ubuntu_18.04 \
 	ubuntu_19.04
@@ -36,11 +35,9 @@ $(TEST_TARGETS):
 	$(VENV_ACTIVATE); \
 	molecule test
 
-run: install $(RUN)
-$(RUN):
+run: install
 	$(VENV_ACTIVATE); \
-	molecule converge; \
-	touch $@	
+	molecule converge	
 
 run-all: install clean $(RUN_TARGETS)
 $(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
