@@ -14,13 +14,13 @@ RUN := .run_timestamp
 
 venv: $(VENV)
 $(VENV):
-	python3 -m venv $(VENV_NAME)/	
+	python3 -m venv $(VENV_NAME)
 	touch $@
 
-install: venv $(SITE_PACKAGES) 
+install: venv $(SITE_PACKAGES)
 $(SITE_PACKAGES): requirements.txt
 	$(VENV_ACTIVATE); \
-	pip3 install -r requirements.txt		
+	pip3 install -r requirements.txt
 
 lint:
 	yamllint .
@@ -45,9 +45,9 @@ $(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
 $(RUN_TARGETS):
 	$(VENV_ACTIVATE); \
 	molecule converge; \
-	molecule destroy	
+	molecule destroy
 
-test: install
+test: install clean
 	$(VENV_ACTIVATE); \
 	molecule test
 
