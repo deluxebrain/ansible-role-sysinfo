@@ -5,8 +5,7 @@ VENV := $(VENV_NAME)/.timestamp
 VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
 SITE_PACKAGES := $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
 	pip3 show pip | grep ^Location | cut -d':' -f2)
-DISTROS := centos_7 \
-	ubuntu_18.04 \
+DISTROS := ubuntu_18.04 \
 	ubuntu_19.04
 TEST_TARGETS := $(addprefix test-,$(DISTROS))
 RUN_TARGETS := $(addprefix run-,$(DISTROS))
@@ -22,6 +21,10 @@ $(SITE_PACKAGES): requirements.txt
 	$(VENV_ACTIVATE); \
 	pip3 install -r requirements.txt; \
 	touch $@
+
+compile: venv
+	$(VENV_ACTIVATE); \
+	pip-compile --generate-hashes requirements.in
 
 lint:
 	yamllint .
@@ -57,10 +60,6 @@ $(TEST_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst test-,,$@))
 $(TEST_TARGETS):
 	$(VENV_ACTIVATE); \
 	molecule test
-
-freeze: venv
-	$(VENV_ACTIVATE); \
-	pip freeze > requirements.txt
 
 clean: install
 	$(VENV_ACTIVATE); \

@@ -1,6 +1,6 @@
 ---
 language: python
-python: 
+python:
   - "2.7"
   - "3.7"
 services:
@@ -8,12 +8,8 @@ services:
 
 env:
   matrix:
-    - MOLECULE_DISTRO: "centos:7"
     - MOLECULE_DISTRO: "ubuntu:18.04"
     - MOLECULE_DISTRO: "ubuntu:19.04"
-
-install:
-  pip install molecule docker
 
 script:
   - molecule --version

@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/deluxebrain/ansible-role-sysinfo.svg?branch=master)](https://travis-ci.org/deluxebrain/ansible-role-sysinfo)
 
-Prints system information related Ansible facts.
+Prints out Ansible facts related to the system information of the hosting platform.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ None.
 
 ## Example Playbook
 
-    - hosts: servers
+    - hosts: all
       roles:
          - deluxebrain.sysinfo
 
@@ -28,4 +28,4 @@ MIT / BSD
 
 ## Author Information
 
-This role was created in 2019 by [deluxebrain](https://www.deluxebrain.com/).
+This role was created in 2020 by [deluxebrain](https://www.deluxebrain.com/).
