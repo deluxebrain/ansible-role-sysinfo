@@ -2,10 +2,7 @@
 - name: Verify
   hosts: all
 
-  # Note: Role variables are not available during molecule test
-  # Therefore must redeclare here
-
   tasks:
-  - name: Example assertion
+  - name: "Example assertion"
     assert:
       that: true
