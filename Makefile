@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := lint
 
 export MOLECULE_INSTANCE_NAME := ansible-role-sysinfo
-DEFAULT_MOLECULE_DISTRO := $(subst -,:,ubuntu-18.04)
+DEFAULT_MOLECULE_DISTRO := ubuntu-20.04
 MOLECULE_DISTROS := ubuntu-18.04 ubuntu-20.04
 VENV_NAME := .venv
 INSTALL_TIMESTAMP := $(VENV_NAME)/.timestamp
@@ -69,9 +69,9 @@ test: clean sync
 	molecule test
 
 ## Run tests against all distros
-TEST_TARGETS := $(addprefix test-,$(MOLECULE_DISTROS))
+TEST_TARGETS := $(addprefix .test-,$(MOLECULE_DISTROS))
 test-all: $(TEST_TARGETS)
-$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst -,:,$(subst test-,,$@))
+$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst -,:,$(subst .test-,,$@))
 $(TEST_TARGETS): clean sync
 	@echo "Running for distro: $(MOLECULE_DISTRO)"
 	. $(VENV_NAME)/bin/activate; \
